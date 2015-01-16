@@ -4,7 +4,7 @@
 
 set -e            # fail fast
 set -o pipefail   # don't ignore exit codes when piping output
-#set -o errtrace   # trap errors in functions as well
+set -o errtrace   # trap errors in functions as well
 # set -x          # enable debugging
 
 # Configure directories
@@ -26,6 +26,7 @@ unset GIT_DIR
 
 # Provide hook to deal with errors
 trap build_failed ERR
+trap exit ERR
 
 ####### Determine current state
 
