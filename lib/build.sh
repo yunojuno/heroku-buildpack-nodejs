@@ -9,8 +9,6 @@ build_failed() {
   info ""
   info "Love,"
   info "Heroku"
-  trap - ERR
-  exit 1
 }
 
 build_succeeded() {
