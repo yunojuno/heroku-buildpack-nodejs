@@ -2,9 +2,9 @@
 
 ####### Configure environment
 
-set -e            # fail fast
-set -o pipefail   # don't ignore exit codes when piping output
+set -o errexit    # always exit on error
 set -o errtrace   # trap errors in functions as well
+set -o pipefail   # don't ignore exit codes when piping output
 # set -x          # enable debugging
 
 # Configure directories
@@ -25,8 +25,20 @@ source $bp_dir/lib/warnings.sh
 unset GIT_DIR
 
 # Provide hook to deal with errors
+build_failed() {
+  head "Build failed"
+  echo ""
+  cat $warnings | indent
+  info "We're sorry this build is failing! If you can't find the issue in application code,"
+  info "please submit a ticket so we can help: https://help.heroku.com/"
+  info "You can also try reverting to our legacy Node.js buildpack:"
+  info "heroku config:set BUILDPACK_URL=https://github.com/heroku/heroku-buildpack-nodejs#v63"
+  info ""
+  info "Love,"
+  info "Heroku"
+  exit 1
+}
 trap build_failed ERR
-trap exit ERR
 
 ####### Determine current state
 
