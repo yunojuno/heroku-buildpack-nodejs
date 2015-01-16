@@ -9,6 +9,7 @@ build_failed() {
   info ""
   info "Love,"
   info "Heroku"
+  exit 1
 }
 
 build_succeeded() {
