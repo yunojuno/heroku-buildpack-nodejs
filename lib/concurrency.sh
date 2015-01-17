@@ -33,5 +33,3 @@ log_concurrency
 export MEMORY_AVAILABLE=$MEMORY_AVAILABLE
 export WEB_MEMORY=$WEB_MEMORY
 export WEB_CONCURRENCY=$WEB_CONCURRENCY
-
-alias node="node --use_idle_notification"
