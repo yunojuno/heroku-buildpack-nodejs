@@ -360,22 +360,22 @@ testMultiExport() {
 
 testConcurrency1X() {
   MEMORY_AVAILABLE=512 capture ${bp_dir}/lib/concurrency.sh
-  assertCaptured "Detected 512 MB available memory, 1024 MB limit per process (WEB_MEMORY)"
+  assertCaptured "Detected 512 MB available memory, 512 MB limit per process (WEB_MEMORY)"
   assertCaptured "Recommending WEB_CONCURRENCY=1"
   assertCapturedSuccess
 }
 
 testConcurrency2X() {
   MEMORY_AVAILABLE=1024 capture ${bp_dir}/lib/concurrency.sh
-  assertCaptured "Detected 1024 MB available memory, 1024 MB limit per process (WEB_MEMORY)"
-  assertCaptured "Recommending WEB_CONCURRENCY=1"
+  assertCaptured "Detected 1024 MB available memory, 512 MB limit per process (WEB_MEMORY)"
+  assertCaptured "Recommending WEB_CONCURRENCY=2"
   assertCapturedSuccess
 }
 
 testConcurrencyPX() {
   MEMORY_AVAILABLE=6144 capture ${bp_dir}/lib/concurrency.sh
-  assertCaptured "Detected 6144 MB available memory, 1024 MB limit per process (WEB_MEMORY)"
-  assertCaptured "Recommending WEB_CONCURRENCY=6"
+  assertCaptured "Detected 6144 MB available memory, 512 MB limit per process (WEB_MEMORY)"
+  assertCaptured "Recommending WEB_CONCURRENCY=12"
   assertCapturedSuccess
 }
 
