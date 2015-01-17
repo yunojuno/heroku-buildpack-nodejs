@@ -163,7 +163,7 @@ install_npm() {
   fi
 }
 
-function build_dependencies() {
+build_dependencies() {
   if [ "$modules_source" == "" ]; then
     info "Skipping dependencies (no source for node_modules)"
 
@@ -215,6 +215,7 @@ write_profile() {
   mkdir -p $build_dir/.profile.d
   echo "export PATH=\"\$HOME/.heroku/node/bin:\$HOME/bin:\$HOME/node_modules/.bin:\$PATH\"" > $build_dir/.profile.d/nodejs.sh
   echo "export NODE_HOME=\"\$HOME/.heroku/node\"" >> $build_dir/.profile.d/nodejs.sh
+  cat $bp_dir/lib/concurrency.sh >> $build_dir/.profile.d/nodejs.sh
 }
 
 write_export() {
