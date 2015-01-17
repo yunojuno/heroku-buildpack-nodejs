@@ -34,4 +34,4 @@ export MEMORY_AVAILABLE=$MEMORY_AVAILABLE
 export WEB_MEMORY=$WEB_MEMORY
 export WEB_CONCURRENCY=$WEB_CONCURRENCY
 
-alias node="node --max_old_space_size=$WEB_MEMORY --use_idle_notification"
+alias node="node --use_idle_notification"
