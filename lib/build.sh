@@ -1,7 +1,7 @@
 build_failed() {
   head "Build failed"
   echo ""
-  cat $warnings | indent
+  cat $warnings
   info "We're sorry this build is failing! If you can't find the issue in application code,"
   info "please submit a ticket so we can help: https://help.heroku.com/"
   info "You can also try reverting to our legacy Node.js buildpack:"
@@ -14,8 +14,8 @@ build_failed() {
 build_succeeded() {
   head "Build succeeded!"
   echo ""
-  (npm ls --depth=0 || true) 2>/dev/null | indent
-  cat $warnings | indent
+  (npm ls --depth=0 || true) 2>/dev/null
+  cat $warnings
 }
 
 get_start_method() {
@@ -101,7 +101,7 @@ show_current_state() {
   info "node_modules cached: $modules_cached"
   echo ""
 
-  printenv | grep ^NPM_CONFIG_ | indent
+  printenv | grep ^NPM_CONFIG_
   info "NODE_MODULES_CACHE=$NODE_MODULES_CACHE"
 }
 
@@ -156,7 +156,7 @@ install_npm() {
       info "npm `npm --version` already installed with node"
     else
       info "Downloading and installing npm $npm_engine (replacing version `npm --version`)..."
-      npm install --unsafe-perm -g npm@$npm_engine 2>&1 >/dev/null | indent
+      npm install --unsafe-perm -g npm@$npm_engine 2>&1 >/dev/null
     fi
     warn_old_npm `npm --version`
   else
@@ -170,9 +170,9 @@ function build_dependencies() {
 
   elif [ "$modules_source" == "prebuilt" ]; then
     info "Rebuilding any native modules for this architecture"
-    npm rebuild 2>&1 | indent
+    npm rebuild 2>&1
     info "Installing any new modules"
-    npm install --unsafe-perm --userconfig $build_dir/.npmrc 2>&1 | indent
+    npm install --unsafe-perm --userconfig $build_dir/.npmrc 2>&1
 
   else
     cache_status=$(get_cache_status)
@@ -181,14 +181,14 @@ function build_dependencies() {
       info "Restoring node modules from cache"
       cp -r $cache_dir/node/node_modules $build_dir/
       info "Pruning unused dependencies"
-      npm --unsafe-perm prune 2>&1 | indent
+      npm --unsafe-perm prune 2>&1 
       info "Installing any new modules"
-      npm install --unsafe-perm --userconfig $build_dir/.npmrc 2>&1 | indent
+      npm install --unsafe-perm --userconfig $build_dir/.npmrc 2>&1
     else
       info "$cache_status"
       info "Installing node modules"
       touch $build_dir/.npmrc
-      npm install --unsafe-perm --userconfig $build_dir/.npmrc 2>&1 | indent
+      npm install --unsafe-perm --userconfig $build_dir/.npmrc 2>&1
     fi
   fi
 }
