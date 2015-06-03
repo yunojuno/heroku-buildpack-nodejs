@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # bin/detect <build-dir>
 
 if [ -f $1/package.json ] || [ -f $1/server.js ]; then

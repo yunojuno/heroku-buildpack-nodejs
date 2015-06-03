@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+mktmpdir() {
+  local dir=$(mktemp -t testXXXXX)
+  rm -rf $dir
+  mkdir $dir
+  echo $dir
+}
+
+compile() {
+  local bp_dir=$(pwd)
+  local fixture=$1
+  local build_dir=$(mktmpdir)
+  local cache_dir=$(mktmpdir)
+  local env_dir=$(mktmpdir)
+  cp -a ${bp_dir}/test/fixtures/$fixture/. ${build_dir}
+  "$bp_dir/bin/compile" "$build_dir" "$cache_dir"
+}
+
+compile ${1:stable-node}

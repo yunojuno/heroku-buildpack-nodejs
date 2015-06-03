@@ -1,5 +1,33 @@
 warnings=$(mktemp -t heroku-buildpack-nodejs-XXXX)
 
+failure_message() {
+  local warn=$(cat $warnings)
+  echo ""
+  echo "We're sorry this build is failing! You can troubleshoot common issues here:"
+  echo "https://devcenter.heroku.com/articles/troubleshooting-node-deploys"
+  echo ""
+  if [ "$warn" != "" ]; then
+    echo "Some possible problems:"
+    echo ""
+    echo "$warn"
+  else
+    echo "If you're stuck, please submit a ticket so we can help:"
+    echo "https://help.heroku.com/"
+  fi
+  echo ""
+  echo "Love,"
+  echo "Heroku"
+  echo ""
+}
+
+warning() {
+  local tip=$1
+  local url=$2
+  echo "- $tip" >> $warnings
+  echo "  ${url:-https://devcenter.heroku.com/articles/nodejs-support}" >> $warnings
+  echo "" >> $warnings
+}
+
 warn_node_engine() {
   local node_engine=$1
   if [ "$node_engine" == "" ]; then

@@ -1,74 +1,109 @@
 #!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir> <env-dir>
 
-####### Configure environment
+### Configure environment
 
 set -o errexit    # always exit on error
-set -o errtrace   # trap errors in functions as well
 set -o pipefail   # don't ignore exit codes when piping output
-set -o posix      # more strict failures in subshells
-# set -x          # enable debugging
+set -o nounset    # fail on unset variables
+unset GIT_DIR     # Avoid GIT_DIR leak from previous build steps
 
-# Configure directories
-build_dir=$1
-cache_dir=$2
-env_dir=$3
-bp_dir=$(cd $(dirname $0); cd ..; pwd)
-heroku_dir=$build_dir/.heroku
-mkdir -p $heroku_dir/node
-warnings=$(mktemp -t heroku-buildpack-nodejs-test-XXXX)
+### Configure directories
 
-# Load dependencies
-source $bp_dir/lib/common.sh
-source $bp_dir/lib/build.sh
-source $bp_dir/lib/warnings.sh
+BUILD_DIR=${1:-}
+CACHE_DIR=${2:-}
+ENV_DIR=${3:-}
+BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 
-# Avoid GIT_DIR leak from previous build steps
-unset GIT_DIR
+mkdir -p "$BUILD_DIR/.heroku/node/"
 
-# Provide hook to deal with errors
-trap build_failed ERR
+### Load dependencies
 
-####### Determine current state
+source $BP_DIR/lib/output.sh
+source $BP_DIR/lib/failure.sh
+source $BP_DIR/lib/environment.sh
+source $BP_DIR/lib/binaries.sh
+source $BP_DIR/lib/cache.sh
+source $BP_DIR/lib/dependencies.sh
 
-head "Reading application state"
-read_current_state
-show_current_state
+### Handle errors
 
-if [ "$iojs_engine" == "" ]; then
-  warn_node_engine "$node_engine"
-else
-  warn_node_engine "$iojs_engine"
-fi
-warn_node_modules "$modules_source"
+handle_failure() {
+  header "Build failed"
+  failure_message | indent
+}
+trap 'handle_failure' ERR
 
-####### Vendor in binaries
+### Compile
 
-head "Installing binaries"
-if [ "$iojs_engine" == "" ]; then
-  install_node "$node_engine"
-else
-  install_iojs "$iojs_engine"
-fi
-install_npm
+create_env() {
+  echo "exporting environment variables"
+  export_env_dir "$ENV_DIR"
+  echo "writing .profile.d scripts"
+  write_profile "$BP_DIR" "$BUILD_DIR"
+  echo "writing buildpack export"
+  write_export "$BP_DIR" "$BUILD_DIR"
+  list_node_config
+}
 
-####### Build the project's dependencies
+header "Creating runtime environment"
+create_env | indent
 
-head "Building dependencies"
-cd $build_dir
-build_dependencies
+install_bins() {
+  local nodejs_engine=$(read_json "$BUILD_DIR/package.json" ".engines.node")
+  local iojs_engine=$(read_json "$BUILD_DIR/package.json" ".engines.iojs")
+  local npm_engine=$(read_json "$BUILD_DIR/package.json" ".engines.npm")
 
-####### Create a Procfile if possible
+  list_engines "$nodejs_engine" "$iojs_engine" "$npm_engine"
+  install_nodejs "$nodejs_engine" "$BUILD_DIR/.heroku/node"
+  install_iojs "$iojs_engine" "$BUILD_DIR/.heroku/node"
+  install_npm "$npm_engine" "$BUILD_DIR/.heroku/node"
+}
 
-head "Checking startup method"
-ensure_procfile "$start_method" "$build_dir"
-warn_start "$start_method"
+header "Installing binaries"
+install_bins | indent
 
-####### Finalize the build
+restore_cache() {
+  local cache_status=$(get_cache_status)
 
-head "Finalizing build"
-write_profile
-write_export
-clean_npm
-clean_cache
-create_cache
-build_succeeded
+  if [ "$cache_status" == "disabled" ]; then
+    echo "skipping (cache disabled)"
+  elif [ "$cache_status" == "invalidated" ]; then
+    echo "skipping (cache invalidated)"
+  else
+    local cache_directories=$(get_cache_directories)
+    if [ "$cache_directories" == "" ]; then
+      echo "no cacheDirectories specified; using default:"
+      restore_cache_directories "node_modules"
+    else
+      echo "using cacheDirectories (package.json):"
+      restore_cache_directories $cache_directories
+    fi
+  fi
+}
+
+header "Restoring cache"
+restore_cache | indent
+
+install_deps() {
+  local dependency_status=get_dependency_status
+  if [ "$dependency_status" == "prebuilt" ]; then
+    echo "node_modules prebuilt"
+    rebuild_node_modules
+  elif [ "$dependency_status" == "unavailable" ]; then
+    echo "no dependencies to install (no package.json)"
+  else
+    install_node_modules
+  fi
+}
+
+header "Installing dependencies"
+install_deps | indent
+
+finalize_build() {
+  create_cache
+  summarize_app
+}
+
+header "Build succeeded"
+finalize_build | indent

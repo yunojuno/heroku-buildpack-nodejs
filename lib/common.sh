@@ -9,11 +9,6 @@ head() {
   echo "-----> $*"
 }
 
-info() {
-  #echo "`date +\"%M:%S\"`  $*"
-  echo "       $*"
-}
-
 warning() {
   local tip=$1
   local url=$2
