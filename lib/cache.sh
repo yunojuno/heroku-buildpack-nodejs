@@ -51,11 +51,11 @@ restore_cache_directories() {
 }
 
 clear_cache() {
-  rm -rf ${1:-}/node
+  rm -rf $CACHE_DIR/node
 }
 
 save_cache_directories() {
-  mkdir -p ${1:-}/node
+  mkdir -p $CACHE_DIR/node
   for dir in "$@"; do
     echo "- $dir"
   done
