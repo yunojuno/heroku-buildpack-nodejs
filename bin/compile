@@ -42,8 +42,11 @@ create_env() {
   write_profile "$BP_DIR" "$BUILD_DIR"
   echo "writing multi-buildpack export"
   write_export "$BP_DIR" "$BUILD_DIR"
-  echo "exporting environment variables:"
+  echo "exporting user environment variables"
   export_env_dir "$ENV_DIR"
+  echo "supplimenting with default env vars"
+  create_default_env
+  echo ""
   list_node_config
 }
 
@@ -105,7 +108,7 @@ cache_build() {
   local cache_directories=$(get_cache_directories)
   echo "clearing previous node cache"
   clear_cache
-  if [ -n "$cache_directories" ]; then
+  if [ "$cache_directories" == "" ]; then
     echo "saving cacheDirectories (default):"
     save_cache_directories "node_modules"
   else

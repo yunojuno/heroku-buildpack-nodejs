@@ -1,3 +1,9 @@
+create_default_env() {
+  export NPM_CONFIG_PRODUCTION=${NPM_CONFIG_PRODUCTION:-true}
+  export NPM_CONFIG_LOGLEVEL=${NPM_CONFIG_LOGLEVEL:-error}
+  export NODE_MODULES_CACHE=${NODE_MODULES_CACHE:-true}
+}
+
 list_node_config() {
   printenv | grep ^NPM_CONFIG_ || true
   printenv | grep ^NODE_ || true
