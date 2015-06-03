@@ -16,6 +16,7 @@ ENV_DIR=${3:-}
 BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 
 mkdir -p "$BUILD_DIR/.heroku/node/"
+cd $BUILD_DIR
 
 ### Load dependencies
 
@@ -37,12 +38,12 @@ trap 'handle_failure' ERR
 ### Compile
 
 create_env() {
-  echo "exporting environment variables"
-  export_env_dir "$ENV_DIR"
   echo "writing .profile.d scripts"
   write_profile "$BP_DIR" "$BUILD_DIR"
-  echo "writing buildpack export"
+  echo "writing multi-buildpack export"
   write_export "$BP_DIR" "$BUILD_DIR"
+  echo "exporting environment variables:"
+  export_env_dir "$ENV_DIR"
   list_node_config
 }
 
@@ -73,10 +74,10 @@ restore_cache() {
   else
     local cache_directories=$(get_cache_directories)
     if [ "$cache_directories" == "" ]; then
-      echo "no cacheDirectories specified; using default:"
+      echo "copying cacheDirectories (default):"
       restore_cache_directories "node_modules"
     else
-      echo "using cacheDirectories (package.json):"
+      echo "copying cacheDirectories (package.json):"
       restore_cache_directories $cache_directories
     fi
   fi
@@ -85,25 +86,42 @@ restore_cache() {
 header "Restoring cache"
 restore_cache | indent
 
-install_deps() {
+build_dependencies() {
   local dependency_status=get_dependency_status
   if [ "$dependency_status" == "prebuilt" ]; then
     echo "node_modules prebuilt"
-    rebuild_node_modules
+    rebuild_node_modules "$BUILD_DIR"
   elif [ "$dependency_status" == "unavailable" ]; then
     echo "no dependencies to install (no package.json)"
   else
-    install_node_modules
+    install_node_modules "$BUILD_DIR"
   fi
 }
 
-header "Installing dependencies"
-install_deps | indent
+header "Building dependencies"
+build_dependencies | indent
 
-finalize_build() {
-  create_cache
-  summarize_app
+cache_build() {
+  local cache_directories=$(get_cache_directories)
+  echo "clearing previous node cache"
+  clear_cache "$CACHE_DIR"
+  if [ -n "$cache_directories" ]; then
+    echo "saving cacheDirectories (default):"
+    save_cache_directories "node_modules"
+  else
+    echo "saving cacheDirectories (package.json):"
+    save_cache_directories $cache_directories
+  fi
 }
 
-header "Build succeeded"
-finalize_build | indent
+header "Caching build"
+cache_build | indent
+
+summarize_build() {
+  cd $BUILD_DIR
+  echo ""
+  (npm ls --depth=0 || true) 2>/dev/null
+}
+
+header "Build succeeded!"
+summarize_build | indent

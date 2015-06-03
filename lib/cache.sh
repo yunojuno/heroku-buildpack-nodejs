@@ -45,7 +45,18 @@ get_cache_directories() {
 }
 
 restore_cache_directories() {
-  for var in "$@"; do
-    echo "- $var"
+  for dir in "$@"; do
+    echo "- $dir"
+  done
+}
+
+clear_cache() {
+  rm -rf ${1:-}/node
+}
+
+save_cache_directories() {
+  mkdir -p ${1:-}/node
+  for dir in "$@"; do
+    echo "- $dir"
   done
 }

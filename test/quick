@@ -8,13 +8,16 @@ mktmpdir() {
 }
 
 compile() {
-  local bp_dir=$(pwd)
   local fixture=$1
+  local bp_dir=$(mktmpdir)
   local build_dir=$(mktmpdir)
   local cache_dir=$(mktmpdir)
   local env_dir=$(mktmpdir)
+  echo "Compiling $fixture"
+  cp -a $(pwd)/* ${bp_dir}
   cp -a ${bp_dir}/test/fixtures/$fixture/. ${build_dir}
   "$bp_dir/bin/compile" "$build_dir" "$cache_dir"
 }
 
-compile ${1:stable-node}
+fixture=${1:-'stable-node'}
+compile "$fixture"
