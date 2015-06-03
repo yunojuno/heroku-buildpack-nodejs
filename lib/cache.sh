@@ -47,6 +47,7 @@ get_cache_directories() {
 restore_cache_directories() {
   for dir in "$@"; do
     echo "- $dir"
+    cp -a "$CACHE_DIR/node/$dir" "$BUILD_DIR/$dir" 2>/dev/null || true
   done
 }
 
@@ -58,5 +59,6 @@ save_cache_directories() {
   mkdir -p $CACHE_DIR/node
   for dir in "$@"; do
     echo "- $dir"
+    cp -a "$BUILD_DIR/$dir" "$CACHE_DIR/node/$dir" 2>/dev/null || true
   done
 }
