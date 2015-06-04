@@ -4,7 +4,7 @@
 BUILD_DIR=${1:-}
 BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 
-source $BP_DIR/lib/processes
+source $BP_DIR/lib/processes.sh
 
 cat << EOF
 addons: []
