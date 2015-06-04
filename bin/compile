@@ -37,6 +37,10 @@ handle_failure() {
 }
 trap 'handle_failure' ERR
 
+### Check initial state
+
+[ -e "$BUILD_DIR/node_modules" ] && PREBUILD=true || PREBUILD=false
+
 ### Compile
 
 create_env() {
@@ -98,7 +102,7 @@ header "Restoring cache"
 restore_cache | indent
 
 build_dependencies() {
-  if [ -e $BUILD_DIR/node_modules ]; then
+  if $PREBUILD; then
     echo "Prebuild detected (node_modules already exists)"
     rebuild_node_modules "$BUILD_DIR"
   else
