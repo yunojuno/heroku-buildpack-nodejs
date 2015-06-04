@@ -17,6 +17,7 @@ BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 
 mkdir -p "$BUILD_DIR/.heroku/node/"
 cd $BUILD_DIR
+export PATH="$BUILD_DIR/.heroku/node/bin":$PATH
 
 ### Load dependencies
 

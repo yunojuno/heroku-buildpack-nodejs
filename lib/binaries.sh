@@ -62,10 +62,6 @@ install_nodejs() {
   curl "$download_url" -s -o - | tar xzf - -C /tmp
   mv /tmp/node-v$version-$os-$cpu/* $dir
   chmod +x $dir/bin/*
-  export PATH=$dir/bin:$PATH
-  echo "listing bin:"
-  ls $dir/bin
-  echo "which node: $(which node)"
 }
 
 install_iojs() {
@@ -84,7 +80,6 @@ install_iojs() {
   curl $download_url -s -o - | tar xzf - -C /tmp
   mv /tmp/iojs-v$version-$os-$cpu/* $dir
   chmod +x $dir/bin/*
-  export PATH=$dir/bin:$PATH
 }
 
 install_npm() {
