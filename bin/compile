@@ -108,7 +108,7 @@ cache_build() {
     echo "cacheDirectories (default):"
     save_cache_directories "$BUILD_DIR" "$CACHE_DIR" "node_modules"
   else
-    echo "cacheDirectories:"
+    echo "cacheDirectories (package.json):"
     save_cache_directories "$BUILD_DIR" "$CACHE_DIR" $cache_directories
   fi
 }
