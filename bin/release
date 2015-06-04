@@ -8,5 +8,5 @@ source $BP_DIR/lib/processes.sh
 
 cat << EOF
 addons: []
-default_process_types: $(default_process_types $BUILD_DIR)
+default_process_types: $(default_process_types "$BUILD_DIR")
 EOF

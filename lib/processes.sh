@@ -12,9 +12,9 @@ default_process_types() {
   if [ -f $build_dir/Procfile ]; then
     cat $build_dir/Procfile | smallindent
   elif [ -f $build_dir/package.json ]; then
-    printf "\n  web: npm start\n"
+    printf "  web: npm start\n"
   elif [ -f $build_dir/server.js ]; then
-    printf "\n  web: node server.js\n"
+    printf "  web: node server.js\n"
   else
     printf "{}"
   fi

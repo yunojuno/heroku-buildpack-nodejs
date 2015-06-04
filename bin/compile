@@ -56,7 +56,7 @@ header "Creating runtime environment"
 create_env | indent
 
 install_bins() {
-  local nodejs_engine=$(read_json "$BUILD_DIR/package.json" ".engines.node")
+  local node_engine=$(read_json "$BUILD_DIR/package.json" ".engines.node")
   local iojs_engine=$(read_json "$BUILD_DIR/package.json" ".engines.iojs")
   local npm_engine=$(read_json "$BUILD_DIR/package.json" ".engines.npm")
 
@@ -71,7 +71,7 @@ install_bins() {
   if [ -n "$iojs_engine" ]; then
     install_iojs "$iojs_engine" "$BUILD_DIR/.heroku/node"
   else
-    install_nodejs "$nodejs_engine" "$BUILD_DIR/.heroku/node"
+    install_nodejs "$node_engine" "$BUILD_DIR/.heroku/node"
   fi
   install_npm "$npm_engine" "$BUILD_DIR/.heroku/node"
 }
@@ -114,9 +114,9 @@ header "Building dependencies"
 build_dependencies | indent
 
 detect_processes() {
-  local procs=$(default_process_types $BUILD_DIR)
+  local procs=$(default_process_types "$BUILD_DIR")
 
-  if [ -n "$procs" ]; then
+  if [ "$procs" == "{}" ]; then
     echo "  (none)"
   else
     echo "$procs"
