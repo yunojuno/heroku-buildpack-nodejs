@@ -58,6 +58,8 @@ install_bins() {
   install_nodejs "$nodejs_engine" "$BUILD_DIR/.heroku/node"
   install_iojs "$iojs_engine" "$BUILD_DIR/.heroku/node"
   install_npm "$npm_engine" "$BUILD_DIR/.heroku/node"
+
+  echo "which node 2: $(which node)"
 }
 
 header "Installing binaries"

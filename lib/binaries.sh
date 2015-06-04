@@ -65,6 +65,7 @@ install_nodejs() {
   export PATH=$dir/bin:$PATH
   echo "listing bin:"
   ls $dir/bin
+  echo "which node: $(which node)"
 }
 
 install_iojs() {
