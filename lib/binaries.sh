@@ -56,6 +56,4 @@ install_npm() {
       npm install --unsafe-perm --quiet -g npm@$version 2>&1 >/dev/null
     fi
   fi
-
-  warn_old_npm `npm --version`
 }

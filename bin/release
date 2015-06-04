@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 # bin/release <build-dir>
 
-BUILD_DIR=${1:-}
-BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
-
-source $BP_DIR/lib/processes.sh
-
 cat << EOF
 addons: []
-default_process_types: $(default_process_types "$BUILD_DIR")
+default_process_types:
+  web: npm start
 EOF

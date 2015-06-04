@@ -61,9 +61,9 @@ warn_missing_package_json() {
 }
 
 warn_old_npm() {
-  local npm_version=${1:-}
+  local npm_version="$(npm --version)"
   if [ "${npm_version:0:1}" -lt "2" ]; then
-    local latest_npm=$(curl --silent --get https://semver.herokuapp.com/npm/stable)
+    local latest_npm="$(curl --silent --get https://semver.herokuapp.com/npm/stable)"
     warning "This version of npm ($npm_version) has several known issues - consider upgrading to the latest release ($latest_npm)" "https://devcenter.heroku.com/articles/nodejs-support#specifying-an-npm-version"
   fi
 }

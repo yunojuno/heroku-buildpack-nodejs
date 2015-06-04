@@ -28,7 +28,6 @@ source $BP_DIR/lib/environment.sh
 source $BP_DIR/lib/binaries.sh
 source $BP_DIR/lib/cache.sh
 source $BP_DIR/lib/dependencies.sh
-source $BP_DIR/lib/processes.sh
 
 ### Handle errors
 
@@ -45,8 +44,8 @@ trap 'handle_failure' ERR
 ### Failures that should be caught immediately
 
 fail_invalid_package_json "$BUILD_DIR"
-warn_prebuilt_modules
-warn_missing_package_json
+warn_prebuilt_modules "$BUILD_DIR"
+warn_missing_package_json "$BUILD_DIR"
 
 ### Compile
 
@@ -55,12 +54,11 @@ create_env() {
   write_export "$BP_DIR" "$BUILD_DIR"
   export_env_dir "$ENV_DIR"
   create_default_env
-  echo ""
-  list_node_config
 }
 
 header "Creating runtime environment"
-create_env | indent
+create_env # can't indent the whole thing because piping causes subshells; no exporting possible
+list_node_config | indent
 
 install_bins() {
   local node_engine=$(read_json "$BUILD_DIR/package.json" ".engines.node")
@@ -83,7 +81,7 @@ install_bins() {
     install_nodejs "$node_engine" "$BUILD_DIR/.heroku/node"
   fi
   install_npm "$npm_engine" "$BUILD_DIR/.heroku/node"
-  warn_old_npm $(npm --version)
+  warn_old_npm
 }
 
 header "Installing binaries"
@@ -99,10 +97,10 @@ restore_cache() {
   else
     local cache_directories=$(get_cache_directories)
     if [ "$cache_directories" == "" ]; then
-      echo "Loading from cacheDirectories (default):"
+      echo "Loading 1 from cacheDirectories (default):"
       restore_cache_directories "$BUILD_DIR" "$CACHE_DIR" "node_modules"
     else
-      echo "Loading from cacheDirectories (package.json):"
+      echo "Loading $(echo $cache_directories | wc -w | xargs) from cacheDirectories (package.json):"
       restore_cache_directories "$BUILD_DIR" "$CACHE_DIR" $cache_directories
     fi
   fi
@@ -114,7 +112,6 @@ restore_cache | indent
 build_dependencies() {
   if $PREBUILD; then
     echo "Prebuild detected (node_modules already exists)"
-
     rebuild_node_modules "$BUILD_DIR"
   else
     install_node_modules "$BUILD_DIR"
@@ -124,28 +121,15 @@ build_dependencies() {
 header "Building dependencies"
 build_dependencies | indent
 
-detect_processes() {
-  local procs=$(default_process_types "$BUILD_DIR")
-
-  if [ "$procs" == "{}" ]; then
-    echo "  (none)"
-  else
-    echo "$procs"
-  fi
-}
-
-header "Detecting process types"
-detect_processes | indent
-
 cache_build() {
   local cache_directories=$(get_cache_directories)
   echo "Clearing previous node cache"
   clear_cache
   if [ "$cache_directories" == "" ]; then
-    echo "Saving cacheDirectories (default):"
+    echo "Saving 1 cacheDirectories (default):"
     save_cache_directories "$BUILD_DIR" "$CACHE_DIR" "node_modules"
   else
-    echo "Saving cacheDirectories (package.json):"
+    echo "Saving $(echo $cache_directories | wc -w | xargs) cacheDirectories (package.json):"
     save_cache_directories "$BUILD_DIR" "$CACHE_DIR" $cache_directories
   fi
 }
