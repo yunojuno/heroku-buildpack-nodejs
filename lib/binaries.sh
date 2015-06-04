@@ -32,25 +32,9 @@ needs_resolution() {
   fi
 }
 
-list_engines() {
-  local node_engine="$1"
-  local iojs_engine="$2"
-  local npm_engine="$3"
-
-  if [ "$iojs_engine" == "" ]; then
-    echo "engines.node (package.json):  ${node_engine:-unspecified}"
-  else
-    echo "engines.iojs (package.json):  $iojs_engine (iojs)"
-  fi
-  echo "engines.npm (package.json):   ${npm_engine:-unspecified (use default)}"
-  echo ""
-}
-
 install_nodejs() {
   local version="$1"
   local dir="$2"
-
-  if [ "$version" == "" ]; then return; fi
 
   if needs_resolution "$version"; then
     echo "Resolving node version ${version:-(latest stable)} via semver.io..."
@@ -67,8 +51,6 @@ install_nodejs() {
 install_iojs() {
   local version="$1"
   local dir="$2"
-
-  if [ "$version" == "" ]; then return; fi
 
   if needs_resolution "$version"; then
     echo "Resolving iojs version ${version:-(latest stable)} via semver.io..."

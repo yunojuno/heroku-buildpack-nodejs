@@ -37,7 +37,7 @@ get_cache_status() {
 get_cache_directories() {
   local dirs1=$(read_json "$BUILD_DIR/package.json" ".cacheDirectories | .[]?")
   local dirs2=$(read_json "$BUILD_DIR/package.json" ".cache_directories | .[]?")
-  
+
   if [ -n "$dirs1" ]; then
     echo "$dirs1"
   else
@@ -53,8 +53,12 @@ restore_cache_directories() {
     if [ -e "$dir" ]; then
       echo "- $dir (exists - skipping)"
     else
-      echo "- $dir"
-      cp -an "$CACHE_DIR/node/$dir" "$BUILD_DIR/$dir" 2>/dev/null || true
+      if [ -e "$CACHE_DIR/node/$dir" ]; then
+        echo "- $dir"
+        cp -an "$CACHE_DIR/node/$dir" "$BUILD_DIR/$dir" 2>/dev/null || true
+      else
+        echo "- $dir (not cached - skipping)"
+      fi
     fi
   done
 }

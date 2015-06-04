@@ -27,6 +27,7 @@ source $BP_DIR/lib/environment.sh
 source $BP_DIR/lib/binaries.sh
 source $BP_DIR/lib/cache.sh
 source $BP_DIR/lib/dependencies.sh
+source $BP_DIR/lib/processes.sh
 
 ### Handle errors
 
@@ -55,15 +56,24 @@ install_bins() {
   local iojs_engine=$(read_json "$BUILD_DIR/package.json" ".engines.iojs")
   local npm_engine=$(read_json "$BUILD_DIR/package.json" ".engines.npm")
 
-  list_engines "$nodejs_engine" "$iojs_engine" "$npm_engine"
-  install_nodejs "$nodejs_engine" "$BUILD_DIR/.heroku/node"
-  install_iojs "$iojs_engine" "$BUILD_DIR/.heroku/node"
+  if [ -n "$iojs_engine" ]; then
+    echo "engines.iojs (package.json):  $iojs_engine (iojs)"
+  else
+    echo "engines.node (package.json):  ${node_engine:-unspecified}"
+  fi
+  echo "engines.npm (package.json):   ${npm_engine:-unspecified (use default)}"
+  echo ""
+
+  if [ -n "$iojs_engine" ]; then
+    install_iojs "$iojs_engine" "$BUILD_DIR/.heroku/node"
+  else
+    install_nodejs "$nodejs_engine" "$BUILD_DIR/.heroku/node"
+  fi
   install_npm "$npm_engine" "$BUILD_DIR/.heroku/node"
 }
 
 header "Installing binaries"
 install_bins | indent
-echo "which node 2: $(which node)"
 
 restore_cache() {
   local cache_status=$(get_cache_status)
@@ -75,10 +85,10 @@ restore_cache() {
   else
     local cache_directories=$(get_cache_directories)
     if [ "$cache_directories" == "" ]; then
-      echo "cacheDirectories (default):"
+      echo "Loading from cacheDirectories (default):"
       restore_cache_directories "$BUILD_DIR" "$CACHE_DIR" "node_modules"
     else
-      echo "cacheDirectories (package.json):"
+      echo "Loading from cacheDirectories (package.json):"
       restore_cache_directories "$BUILD_DIR" "$CACHE_DIR" $cache_directories
     fi
   fi
@@ -88,12 +98,9 @@ header "Restoring cache"
 restore_cache | indent
 
 build_dependencies() {
-  local dependency_status=get_dependency_status
-  if [ "$dependency_status" == "prebuilt" ]; then
+  if [ -e $BUILD_DIR/node_modules ]; then
     echo "Prebuild detected (node_modules already exists)"
     rebuild_node_modules "$BUILD_DIR"
-  elif [ "$dependency_status" == "unavailable" ]; then
-    echo "Skipping (no package.json)"
   else
     install_node_modules "$BUILD_DIR"
   fi
@@ -102,15 +109,28 @@ build_dependencies() {
 header "Building dependencies"
 build_dependencies | indent
 
+detect_processes() {
+  local procs=$(default_process_types $BUILD_DIR)
+
+  if [ -n "$procs" ]; then
+    echo "  (none)"
+  else
+    echo "$procs"
+  fi
+}
+
+header "Detecting process types"
+detect_processes | indent
+
 cache_build() {
   local cache_directories=$(get_cache_directories)
   echo "Clearing previous node cache"
   clear_cache
   if [ "$cache_directories" == "" ]; then
-    echo "cacheDirectories (default):"
+    echo "Saving cacheDirectories (default):"
     save_cache_directories "$BUILD_DIR" "$CACHE_DIR" "node_modules"
   else
-    echo "cacheDirectories (package.json):"
+    echo "Saving cacheDirectories (package.json):"
     save_cache_directories "$BUILD_DIR" "$CACHE_DIR" $cache_directories
   fi
 }
@@ -120,7 +140,7 @@ cache_build | indent
 
 summarize_build() {
   cd $BUILD_DIR
-  (npm ls --depth=0 || true) 2>/dev/null
+  (npm ls --depth=0 | tail -n +2 || true) 2>/dev/null
 }
 
 header "Build succeeded!"

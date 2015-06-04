@@ -1,17 +1,12 @@
 #!/usr/bin/env bash
 # bin/release <build-dir>
-default_process_types() {
-  local bp_dir=$(cd $(dirname $0); cd ..; pwd)
-  local file="/tmp/default_process_types"
-  local result="default_process_types: {}"
-  if [ -f $file ]; then
-    result="default_process_types:\n  $(cat $file)"
-    rm $file
-  fi
-  echo -e "$result"
-}
+
+BUILD_DIR=${1:-}
+BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
+
+source $BP_DIR/lib/processes
 
 cat << EOF
 addons: []
-$(default_process_types)
+default_process_types: $(default_process_types $BUILD_DIR)
 EOF
