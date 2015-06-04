@@ -28,9 +28,7 @@ write_profile() {
   local bp_dir="$1"
   local build_dir="$2"
   mkdir -p $build_dir/.profile.d
-  echo "export PATH=\"\$HOME/.heroku/node/bin:\$HOME/bin:\$HOME/node_modules/.bin:\$PATH\"" > $build_dir/.profile.d/nodejs.sh
-  echo "export NODE_HOME=\"\$HOME/.heroku/node\"" >> $build_dir/.profile.d/nodejs.sh
-  cat $bp_dir/lib/concurrency.sh >> $build_dir/.profile.d/nodejs.sh
+  cp $bp_dir/profile/* $build_dir/.profile.d/
 }
 
 write_export() {

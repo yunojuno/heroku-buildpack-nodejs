@@ -37,6 +37,7 @@ get_cache_status() {
 get_cache_directories() {
   local dirs1=$(read_json "$BUILD_DIR/package.json" ".cacheDirectories | .[]?")
   local dirs2=$(read_json "$BUILD_DIR/package.json" ".cache_directories | .[]?")
+  
   if [ -n "$dirs1" ]; then
     echo "$dirs1"
   else
@@ -45,9 +46,16 @@ get_cache_directories() {
 }
 
 restore_cache_directories() {
-  for dir in "$@"; do
-    echo "- $dir"
-    cp -a "$CACHE_DIR/node/$dir" "$BUILD_DIR/$dir" 2>/dev/null || true
+  local build_dir=${1:-}
+  local cache_dir=${2:-}
+
+  for dir in ${@:3}; do
+    if [ -e "$dir" ]; then
+      echo "- $dir (exists - skipping)"
+    else
+      echo "- $dir"
+      cp -an "$CACHE_DIR/node/$dir" "$BUILD_DIR/$dir" 2>/dev/null || true
+    fi
   done
 }
 
@@ -56,9 +64,12 @@ clear_cache() {
 }
 
 save_cache_directories() {
-  mkdir -p $CACHE_DIR/node
-  for dir in "$@"; do
+  local build_dir=${1:-}
+  local cache_dir=${2:-}
+
+  mkdir -p $cache_dir/node
+  for dir in ${@:3}; do
     echo "- $dir"
-    cp -a "$BUILD_DIR/$dir" "$CACHE_DIR/node/$dir" 2>/dev/null || true
+    cp -a "$build_dir/$dir" "$cache_dir/node/$dir" 2>/dev/null || true
   done
 }

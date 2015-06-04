@@ -38,13 +38,9 @@ trap 'handle_failure' ERR
 ### Compile
 
 create_env() {
-  echo "Writing .profile.d scripts"
   write_profile "$BP_DIR" "$BUILD_DIR"
-  echo "Writing multi-buildpack export"
   write_export "$BP_DIR" "$BUILD_DIR"
-  echo "Exporting user environment variables"
   export_env_dir "$ENV_DIR"
-  echo "Supplimenting with default env vars"
   create_default_env
   echo ""
   list_node_config
@@ -78,10 +74,10 @@ restore_cache() {
     local cache_directories=$(get_cache_directories)
     if [ "$cache_directories" == "" ]; then
       echo "cacheDirectories (default):"
-      restore_cache_directories "node_modules"
+      restore_cache_directories "$BUILD_DIR" "$CACHE_DIR" "node_modules"
     else
       echo "cacheDirectories (package.json):"
-      restore_cache_directories $cache_directories
+      restore_cache_directories "$BUILD_DIR" "$CACHE_DIR" $cache_directories
     fi
   fi
 }
@@ -92,12 +88,11 @@ restore_cache | indent
 build_dependencies() {
   local dependency_status=get_dependency_status
   if [ "$dependency_status" == "prebuilt" ]; then
-    echo "source: prebuilt (node_modules already exists)"
+    echo "Prebuild detected (node_modules already exists)"
     rebuild_node_modules "$BUILD_DIR"
   elif [ "$dependency_status" == "unavailable" ]; then
-    echo "source: none (no package.json)"
+    echo "Skipping (no package.json)"
   else
-    echo "source: package.json"
     install_node_modules "$BUILD_DIR"
   fi
 }
@@ -110,11 +105,11 @@ cache_build() {
   echo "Clearing previous node cache"
   clear_cache
   if [ "$cache_directories" == "" ]; then
-    echo "source: default"
-    save_cache_directories "node_modules"
+    echo "cacheDirectories (default):"
+    save_cache_directories "$BUILD_DIR" "$CACHE_DIR" "node_modules"
   else
-    echo "source: cacheDirectories"
-    save_cache_directories $cache_directories
+    echo "cacheDirectories:"
+    save_cache_directories "$BUILD_DIR" "$CACHE_DIR" $cache_directories
   fi
 }
 
