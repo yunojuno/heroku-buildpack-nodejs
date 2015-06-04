@@ -1,28 +1,3 @@
-get_os() {
-  uname | tr A-Z a-z
-}
-
-get_cpu() {
-  if [[ "$(uname -p)" = "i686" ]]; then
-    echo "x86"
-  else
-    echo "x64"
-  fi
-}
-
-os=$(get_os)
-cpu=$(get_cpu)
-
-read_json() {
-  local file=$1
-  local key=$2
-  if test -f $file; then
-    cat $file | $BP_DIR/vendor/jq-$os --raw-output "$key // \"\"" || return 1
-  else
-    echo ""
-  fi
-}
-
 needs_resolution() {
   local semver=$1
   if ! [[ "$semver" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
@@ -78,7 +53,7 @@ install_npm() {
       echo "npm `npm --version` already installed with node"
     else
       echo "Downloading and installing npm $version (replacing version `npm --version`)..."
-      npm install --unsafe-perm --quiet -g npm@$version 2>&1 >/dev/null | indent
+      npm install --unsafe-perm --quiet -g npm@$version 2>&1 >/dev/null
     fi
   fi
 

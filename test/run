@@ -22,26 +22,22 @@ testBadJson() {
   compile "bad-json"
   assertCaptured "Build failed"
   assertCaptured "We're sorry this build is failing"
-  assertNotCaptured "build directory..."
   assertNotCaptured "Installing binaries"
   assertCapturedError 1 "Unable to parse"
 }
 
 testIoJs() {
   compile "iojs"
-  assertCaptured "Node engine:         1.0."
-  assertCaptured "(iojs)"
-  assertCaptured "detected node version: v1.0."
+  assertCaptured "engines.iojs (package.json):  1.0."
+  assertCaptured "Downloading and installing iojs 1.0."
   assertCapturedSuccess
 }
 
 testNoVersion() {
   compile "no-version"
-  assertCaptured "Node engine:         unspecified"
+  assertCaptured "engines.node (package.json):  unspecified"
   assertCaptured "Resolving node version (latest stable) via semver.io"
-  assertCaptured "Downloading and installing node 0.12"
-  assertNotCaptured "Node version not specified in package.json"
-  assertNotCaptured "We're sorry this build is failing"
+  assertCaptured "Downloading and installing node 0.12."
   assertCapturedSuccess
 }
 
@@ -50,13 +46,12 @@ testSpecificVersion() {
   assertNotCaptured "Resolving node version"
   assertCaptured "Downloading and installing node 0.10.29"
   assertCaptured "Using default npm version: 1.4.14"
-  assertNotCaptured "We're sorry this build is failing"
   assertCapturedSuccess
 }
 
 testStableVersion() {
   compile "stable-node"
-  assertCaptured "Downloading and installing node 0.10"
+  assertCaptured "Downloading and installing node 0.10."
   assertNotCaptured "We're sorry this build is failing"
   assertCapturedSuccess
 }
@@ -64,7 +59,7 @@ testStableVersion() {
 testUnstableVersion() {
   compile "unstable-version"
   assertCaptured "Resolving node version 0.11.x via semver.io"
-  assertCaptured "Downloading and installing node 0.11"
+  assertCaptured "Downloading and installing node 0.11."
   assertCapturedSuccess
 }
 
@@ -73,6 +68,11 @@ testOldNpm() {
   assertCaptured "This version of npm (1.2.8000) has several known issues - consider upgrading to the latest release (2."
   assertNotCaptured "integer expression expected"
   assertCapturedError
+}
+
+testOldNpm2() {
+  compile "failing-build"
+  assertCaptured "This version of npm (1.4.8) has several known issues"
 }
 
 testNonexistentNpm() {
@@ -124,8 +124,8 @@ testWarningsOnFailure() {
 testTicketOnFailure() {
   compile "invalid-dependency"
   assertCaptured "troubleshooting-node-deploys"
-  assertNotCaptured "During the build we spotted some likely problems"
   assertCaptured "please submit a ticket"
+  assertNotCaptured "possible problems"
   assertCapturedError
 }
 
@@ -488,7 +488,9 @@ default_process_types_cleanup() {
 
 compile() {
   default_process_types_cleanup
-  compile_dir=$(mktmpdir)
+  local bp_dir=$(mktmpdir)
+  local compile_dir=$(mktmpdir)
+  cp -a $(pwd)/* ${bp_dir}
   cp -a ${bp_dir}/test/fixtures/$1/. ${compile_dir}
   capture ${bp_dir}/bin/compile ${compile_dir} ${2:-$(mktmpdir)} $3
 }

@@ -22,6 +22,7 @@ export PATH="$BUILD_DIR/.heroku/node/bin":$PATH
 ### Load dependencies
 
 source $BP_DIR/lib/output.sh
+source $BP_DIR/lib/json.sh
 source $BP_DIR/lib/failure.sh
 source $BP_DIR/lib/environment.sh
 source $BP_DIR/lib/binaries.sh
@@ -40,6 +41,12 @@ trap 'handle_failure' ERR
 ### Check initial state
 
 [ -e "$BUILD_DIR/node_modules" ] && PREBUILD=true || PREBUILD=false
+
+### Failures that should be caught immediately
+
+fail_invalid_package_json "$BUILD_DIR"
+warn_prebuilt_modules
+warn_missing_package_json
 
 ### Compile
 
@@ -69,11 +76,14 @@ install_bins() {
   echo ""
 
   if [ -n "$iojs_engine" ]; then
+    warn_node_engine "$iojs_engine"
     install_iojs "$iojs_engine" "$BUILD_DIR/.heroku/node"
   else
+    warn_node_engine "$node_engine"
     install_nodejs "$node_engine" "$BUILD_DIR/.heroku/node"
   fi
   install_npm "$npm_engine" "$BUILD_DIR/.heroku/node"
+  warn_old_npm $(npm --version)
 }
 
 header "Installing binaries"
@@ -104,6 +114,7 @@ restore_cache | indent
 build_dependencies() {
   if $PREBUILD; then
     echo "Prebuild detected (node_modules already exists)"
+
     rebuild_node_modules "$BUILD_DIR"
   else
     install_node_modules "$BUILD_DIR"

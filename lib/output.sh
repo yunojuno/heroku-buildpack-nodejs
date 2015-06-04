@@ -17,3 +17,8 @@ header() {
   echo ""
   echo "-----> $*"
 }
+
+error() {
+  echo " !     $*" >&2
+  echo ""
+}
