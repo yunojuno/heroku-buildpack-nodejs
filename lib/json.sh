@@ -12,7 +12,7 @@ get_cpu() {
 
 os=$(get_os)
 cpu=$(get_cpu)
-alias jq="$BP_DIR/vendor/jq-$os"
+alias jq "$BP_DIR/vendor/jq-$os"
 
 read_json() {
   local file=$1
