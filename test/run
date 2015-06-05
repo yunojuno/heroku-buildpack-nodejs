@@ -6,22 +6,16 @@ testDisableCache() {
   env_dir=$(mktmpdir)
 
   compile "node-modules-cache-1" $cache
-  cat ${STD_OUT}
-  cat ${STD_ERR}
   assertCaptured "lodash@1.0.0"
   assertEquals "1" "$(ls -1 $cache/node/node_modules | grep lodash | wc -l | tr -d ' ')"
   assertCapturedSuccess
 
   compile "node-modules-cache-2" $cache
-  cat ${STD_OUT}
-  cat ${STD_ERR}
   assertCaptured "lodash@1.0.0"
   assertCapturedSuccess
 
   echo "false" > $env_dir/NODE_MODULES_CACHE
   compile "node-modules-cache-2" $cache $env_dir
-  cat ${STD_OUT}
-  cat ${STD_ERR}
   assertCaptured "lodash@1.3.1"
   assertCapturedSuccess
 }
