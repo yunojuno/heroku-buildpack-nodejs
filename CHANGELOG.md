@@ -1,5 +1,9 @@
 # Node.js Buildpack Changelog
 
+## v80 (2015-08-14)
+
+Fixes not defaulting to `NODE_ENV=production` during runtime
+
 ## v79 (2015-08-10)
 
 Supports WEB_CONCURRENCY for Performance-M dynos
