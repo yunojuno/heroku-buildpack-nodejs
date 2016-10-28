@@ -21,7 +21,7 @@ failure_message() {
 }
 
 fail_invalid_package_json() {
-  if ! cat ${1:-}/yunojuno/frontend/package.json | $JQ "." 1>/dev/null; then
+  if ! cat ${1:-}/package.json | $JQ "." 1>/dev/null; then
     error "Unable to parse package.json"
     return 1
   fi
