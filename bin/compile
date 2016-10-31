@@ -137,12 +137,6 @@ build_dependencies() {
   # Check and run gulp
   (
     if [ -f $BUILD_DIR/gulpfile.js ]; then
-      # get the env vars
-      if [ -d "$ENV_DIR" ]; then
-        status "Exporting config vars to environment"
-        export_env_dir $env_dir
-      fi
-
       # Install gulp locally
       npm install gulp
       echo "-----> Found gulpfile, running gulp heroku:$NODE_ENV task"
