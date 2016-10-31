@@ -171,6 +171,7 @@ cache_build() {
 
 header "Caching build"
 cache_build | output "$LOG_FILE"
+rm -Rf node_modules/
 
 summarize_build() {
   cd $BUILD_DIR
