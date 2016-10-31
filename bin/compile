@@ -98,7 +98,7 @@ install_bins() {
   #fi
   
   # Manually add old phantomjs, ffs.
-  npm i -g phantomjs-prebuilt@2.1.0
+  npm i -g phantomjs-prebuilt@2.1.10
 
   warn_old_npm
 }
