@@ -96,6 +96,9 @@ install_bins() {
   #if [ -f "$BUILD_DIR/yarn.lock" ]; then
   install_yarn "$BUILD_DIR/.heroku/yarn"
   #fi
+  
+  # Manually add old phantomjs, ffs.
+  yarn add phantomjs@1.9.7-15
 
   warn_old_npm
 }
