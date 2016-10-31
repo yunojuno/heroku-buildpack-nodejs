@@ -93,9 +93,9 @@ install_bins() {
     install_nodejs "$node_engine" "$BUILD_DIR/.heroku/node"
     install_npm "$npm_engine" "$BUILD_DIR/.heroku/node"
   fi
-  if [ -f "$BUILD_DIR/yarn.lock" ]; then
-    install_yarn "$BUILD_DIR/.heroku/yarn"
-  fi
+  #if [ -f "$BUILD_DIR/yarn.lock" ]; then
+  install_yarn "$BUILD_DIR/.heroku/yarn"
+  #fi
 
   warn_old_npm
 }
@@ -125,14 +125,14 @@ restore_cache | output "$LOG_FILE"
 
 build_dependencies() {
   run_if_present 'heroku-prebuild'
-  if $PREBUILD; then
-    echo "Prebuild detected (node_modules already exists)"
-    rebuild_node_modules "$BUILD_DIR"
-  elif [ -f "$BUILD_DIR/yarn.lock" ]; then
+  #if $PREBUILD; then
+  #  echo "Prebuild detected (node_modules already exists)"
+  #  rebuild_node_modules "$BUILD_DIR"
+  #elif [ -f "$BUILD_DIR/yarn.lock" ]; then
     yarn_node_modules "$BUILD_DIR"
-  else
-    install_node_modules "$BUILD_DIR"
-  fi
+  #else
+  #  install_node_modules "$BUILD_DIR"
+  #fi
   
   # Check and run gulp
   (
@@ -178,6 +178,8 @@ summarize_build() {
   if [ -f "$BUILD_DIR/yarn.lock" ]; then
     echo ""
     (yarn ls || true) 2>/dev/null
+    echo ""
+    cat yarn.lock 2>/dev/null
     echo ""
   else
     (npm ls --depth=0 | tail -n +2 || true) 2>/dev/null
