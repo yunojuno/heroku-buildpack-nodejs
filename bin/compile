@@ -182,8 +182,6 @@ summarize_build() {
     echo ""
     (yarn ls || true) 2>/dev/null
     echo ""
-    cat yarn.lock 2>/dev/null
-    echo ""
   else
     (npm ls --depth=0 | tail -n +2 || true) 2>/dev/null
   fi
