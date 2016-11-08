@@ -17,6 +17,8 @@ load_signature() {
 }
 
 get_cache_status() {
+  echo $(create_signature)
+  echo $(load_signature)
   if ! ${NODE_MODULES_CACHE:-true}; then
     echo "disabled by config"
   elif [ "$(create_signature)" != "$(load_signature)" ]; then
