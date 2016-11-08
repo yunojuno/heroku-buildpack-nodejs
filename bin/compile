@@ -113,10 +113,10 @@ restore_cache() {
     local cache_directories=$(get_cache_directories)
     if [ "$cache_directories" == "" ]; then
       echo "Loading 2 from cacheDirectories (default):"
-      #restore_cache_directories "$BUILD_DIR" "$CACHE_DIR" "$DEFAULT_CACHE"
+      restore_cache_directories "$BUILD_DIR" "$CACHE_DIR" "$DEFAULT_CACHE"
     else
       echo "Loading $(echo $cache_directories | wc -w | xargs) from cacheDirectories (package.json):"
-      #restore_cache_directories "$BUILD_DIR" "$CACHE_DIR" $cache_directories
+      restore_cache_directories "$BUILD_DIR" "$CACHE_DIR" $cache_directories
     fi
   else
     echo "Skipping cache restore ($cache_status)"
