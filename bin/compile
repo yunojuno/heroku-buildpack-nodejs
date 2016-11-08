@@ -126,6 +126,8 @@ restore_cache() {
 header "Restoring cache"
 restore_cache | output "$LOG_FILE"
 
+clear_cache
+
 build_dependencies() {
   run_if_present 'heroku-prebuild'
   if $PREBUILD; then
