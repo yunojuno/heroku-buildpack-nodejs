@@ -11,7 +11,7 @@ yarn_node_modules() {
   local build_dir=${1:-}
 
   echo "Installing node modules (yarn)"
-  yarn --ignore-optional 2>&1
+  yarn --ignore-optional --production 2>&1
 }
 
 install_node_modules() {
