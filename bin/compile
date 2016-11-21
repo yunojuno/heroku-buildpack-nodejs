@@ -93,9 +93,9 @@ install_bins() {
     install_nodejs "$node_engine" "$BUILD_DIR/.heroku/node"
     install_npm "$npm_engine" "$BUILD_DIR/.heroku/node"
   fi
-  if [ -f "$BUILD_DIR/yarn.lock" ]; then
+  #if [ -f "$BUILD_DIR/yarn.lock" ]; then
   install_yarn "$BUILD_DIR/.heroku/yarn"
-  fi
+  #fi
   
   # Manually add old phantomjs, ffs.
   npm i -g phantomjs-prebuilt@2.1.10
