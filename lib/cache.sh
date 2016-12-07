@@ -72,6 +72,7 @@ save_cache_directories() {
       echo "- $cachepath"
       mkdir -p "$cache_dir/node/$cachepath"
       cp -a "$build_dir/$cachepath" $(dirname "$cache_dir/node/$cachepath")
+      rm -Rf $build_dir/$cachepath
     else
       echo "- $cachepath (nothing to cache)"
     fi
