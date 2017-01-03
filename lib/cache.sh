@@ -17,8 +17,6 @@ load_signature() {
 }
 
 get_cache_status() {
-  #echo $(create_signature)
-  #echo $(load_signature)
   if ! ${NODE_MODULES_CACHE:-true}; then
     echo "disabled by config"
   elif [ "$(create_signature)" != "$(load_signature)" ]; then
@@ -72,7 +70,7 @@ save_cache_directories() {
       echo "- $cachepath"
       mkdir -p "$cache_dir/node/$cachepath"
       cp -a "$build_dir/$cachepath" $(dirname "$cache_dir/node/$cachepath")
-      #rm -Rf $build_dir/$cachepath
+      rm -Rf $build_dir/$cachepath
     else
       echo "- $cachepath (nothing to cache)"
     fi
