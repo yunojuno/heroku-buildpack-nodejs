@@ -108,7 +108,6 @@ install_bins | output "$LOG_FILE"
 
 restore_cache() {
   local cache_status="$(get_cache_status)"
-  echo $cache_status
   if [ "$cache_status" == "valid" ]; then
     local cache_directories=$(get_cache_directories)
     if [ "$cache_directories" == "" ]; then
@@ -141,9 +140,9 @@ build_dependencies() {
   (
     if [ -f $BUILD_DIR/gulpfile.js ]; then
       # Install gulp locally
-      npm install gulp
+      npm install gulpjs/gulp#4.0
       echo "-----> Found gulpfile, running gulp heroku:$NODE_ENV task"
-      $BUILD_DIR/node_modules/.bin/gulp heroku:$NODE_ENV
+      $BUILD_DIR/node_modules/.bin/gulp heroku:$NODE_ENV --production
     else
       echo "-----> No gulpfile found"
     fi
