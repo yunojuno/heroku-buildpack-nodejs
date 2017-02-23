@@ -99,6 +99,9 @@ install_bins() {
   
   # Manually add old phantomjs, ffs.
   npm i -g phantomjs-prebuilt@2.1.10
+  
+  # Manually add node-sass https://github.com/sass/node-sass/issues/1579
+  npm i node-sass --no-bin-links
 
   warn_old_npm
 }
