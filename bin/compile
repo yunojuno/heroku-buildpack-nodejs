@@ -45,6 +45,7 @@ handle_failure() {
   warn_missing_devdeps "$LOG_FILE"
   warn_econnreset "$LOG_FILE"
   failure_message | output "$LOG_FILE"
+  cat output
 }
 trap 'handle_failure' ERR
 
