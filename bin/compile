@@ -144,7 +144,7 @@ build_dependencies() {
   (
     if [ -f $BUILD_DIR/gulpfile.js ]; then
       # Install gulp locally
-      npm install gulpjs/gulp#4.0
+      #npm install gulpjs/gulp#4.0
       echo "-----> Found gulpfile, running gulp heroku:$NODE_ENV task"
       $BUILD_DIR/node_modules/.bin/gulp heroku:$NODE_ENV --production
     else
